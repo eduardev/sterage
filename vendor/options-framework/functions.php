@@ -10,10 +10,6 @@
 define( 'OPTIONS_FRAMEWORK_DIRECTORY', get_template_directory_uri() . '/sterage/vendor/options-framework/inc/' );
 require_once __DIR__ . '/inc/options-framework.php';
 
-// Loads options.php from child or parent theme
-$optionsfile = __DIR__ . '/options.php';
-load_template( $optionsfile );
-
 /*
  * This is an example of how to add custom scripts to the options panel.
  * This one shows/hides the an option when a checkbox is clicked.
@@ -34,14 +30,6 @@ jQuery(document).ready(function() {
 	if (jQuery('#home_show_box_links:checked').val() !== undefined) {
 		jQuery('.home-page-links').show();
 	}
-	
-	jQuery('#home_show_news').click(function() {
-  		jQuery('.home-page-news').fadeToggle(400);
-	});
-
-	if (jQuery('#home_show_news:checked').val() !== undefined) {
-		jQuery('.home-page-news').show();
-	}
 
 });
 </script>
@@ -54,9 +42,9 @@ jQuery(document).ready(function() {
  */
 function prefix_options_menu_filter( $menu ) {
 	$menu['mode']		= 'menu';
-	$menu['page_title'] = __( 'Horizon Options', 'roots');
-	$menu['menu_title'] = __( 'Horizon Options', 'roots');
-	$menu['menu_slug']	= 'horizon-options';
+	$menu['page_title'] = __( 'Options', 'sage');
+	$menu['menu_title'] = __( 'Options', 'sage');
+	$menu['menu_slug']	= THEME_NAME . '-options';
 	return $menu;
 }
 add_filter( 'optionsframework_menu', 'prefix_options_menu_filter' );

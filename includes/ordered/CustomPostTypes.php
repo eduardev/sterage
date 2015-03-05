@@ -15,7 +15,19 @@
  */
 class CustomPostTypes {
 	
-	
+	/**
+	 * Load all custom post type files
+	 */
+	function __construct() {
+		$dir = new DirectoryIterator(dirname(__FILE__) . '/../../cpts');
+		foreach ($dir as $fileinfo) {
+			if ('php' === $fileinfo->getExtension()) {
+				require_once $fileinfo->getPathname();
+			}
+		}
+		unset($dir, $fileinfo);
+	}
+
 	
 }
 $cpts	= new CustomPostTypes();

@@ -15,19 +15,29 @@
  */
 class SterageLoader {
 	
-	function __construct($loadOptions = true, $loadTGM = true) {
+	/**
+	 * 
+	 * @param type $themeName
+	 * @param type $loadOptions
+	 * @param type $loadTGM
+	 */
+	function __construct($themeName, $loadOptions = true, $loadTGM = true) {
+		
+		define('THEME_NAME', $themeName);
 		
 		if ($loadOptions)	{ $this->loadThemeOptions(); }
 		if ($loadTGM)		{ $this->loadTGMPluginActivator(); }
 		
+		$this->loadOrderedFiles();
+		$this->loadUnorderedFiles();
+		
 	}
-
 	
 	/**
 	 * Check if we have Theme Options
 	 */
 	private function loadThemeOptions() {
-		$of_functions	= __DIR__ . '/options-framework/functions.php';
+		$of_functions	= __DIR__ . '/vendor/options-framework/functions.php';
 		if (file_exists($of_functions)) {
 			require_once $of_functions;
 		}
@@ -45,6 +55,47 @@ class SterageLoader {
 		}
 	}
 	
+	/**
+	 * Ordered custom theme includes
+	 *
+	 * The $customIncludes array determines the code library included in our theme.
+	 * Add or remove files to the array as needed. Supports child theme overrides.
+	 *
+	 * Please note that missing files will produce a fatal error.
+	 *
+	 * @link https://github.com/roots/roots/pull/1042
+	 */
+	private function loadOrderedFiles() {
+		$orderedFiles = array(
+			'CustomPostTypes.php',		// Custom Post Types
+		);
+		foreach ($orderedFiles as $file) {
+			if (!$filepath = locate_template('sterage/includes/ordered/' . $file)) {
+				trigger_error(sprintf(__('Error locating %s for inclusion', 'roots'), $file), E_USER_ERROR);
+			}
+			require_once $filepath;
+		}
+		unset($file, $filepath);
+	}
+	
+	
+	/**
+	 * Now loop and include all files inside our custom-lib directory.
+	 * NOTE: the order to load is alphabetical. If needed any specific order
+	 * use the array $customIncludes above.
+	 */
+	private function loadUnorderedFiles() {
+		$dir = new DirectoryIterator(dirname(__FILE__) . '/includes/wild');
+		foreach ($dir as $fileinfo) {
+			if (!$fileinfo->isDot()) {
+				if ('php' === $fileinfo->getExtension()) {
+					require_once $fileinfo->getPathname();
+				}
+			}
+		}
+		unset($dir, $fileinfo);
+	}
+	
 }
 
-$sterage	= new SterageLoader();
+$sterage	= new SterageLoader('supercpt_sterage');

@@ -15,18 +15,22 @@
  */
 class SterageLoader {
 	
+	protected $steragePath;
+
 	/**
 	 * 
 	 * @param type $themeName
 	 * @param type $loadOptions
 	 * @param type $loadTGM
 	 */
-	function __construct($themeName, $loadOptions = true, $loadTGM = true) {
+	function __construct($themeName, $steragePath = 'sterage', $loadOptions = true, $loadTGM = true) {
 		
 		define('THEME_NAME', $themeName);
 		
 		if ($loadOptions)	{ $this->loadThemeOptions(); }
 		if ($loadTGM)		{ $this->loadTGMPluginActivator(); }
+		
+		$this->steragePath	= $steragePath;
 		
 		$this->loadOrderedFiles();
 		$this->loadUnorderedFiles();
@@ -69,8 +73,9 @@ class SterageLoader {
 		$orderedFiles = array(
 			'CustomPostTypes.php',		// Custom Post Types
 		);
+		
 		foreach ($orderedFiles as $file) {
-			if (!$filepath = locate_template('sterage/includes/ordered/' . $file)) {
+			if (!$filepath = locate_template($this->steragePath . '/includes/ordered/' . $file)) {
 				trigger_error(sprintf(__('Error locating %s for inclusion', 'roots'), $file), E_USER_ERROR);
 			}
 			require_once $filepath;
@@ -87,10 +92,8 @@ class SterageLoader {
 	private function loadUnorderedFiles() {
 		$dir = new DirectoryIterator(dirname(__FILE__) . '/includes/wild');
 		foreach ($dir as $fileinfo) {
-			if (!$fileinfo->isDot()) {
-				if ('php' === $fileinfo->getExtension()) {
-					require_once $fileinfo->getPathname();
-				}
+			if (!$fileinfo->isDot() && 'php' === $fileinfo->getExtension()) {
+				require_once $fileinfo->getPathname();
 			}
 		}
 		unset($dir, $fileinfo);
@@ -98,4 +101,4 @@ class SterageLoader {
 	
 }
 
-$sterage	= new SterageLoader('supercpt_sterage');
+$sterage	= new SterageLoader('HERITAGE', 'lib/sterage');
